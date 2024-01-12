@@ -1,6 +1,5 @@
 class AccountLoL:
 
-
     def __init__(self, id, nick, level, league, tier, winrate, pdl, op_gg, best_champ):
         self.id = id
         self.nick = nick
@@ -11,5 +10,3 @@ class AccountLoL:
         self.pdl = pdl
         self.op_gg = op_gg
         self.best_champ = best_champ
-
-

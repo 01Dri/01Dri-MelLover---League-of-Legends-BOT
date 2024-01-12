@@ -43,25 +43,6 @@ class ApiRiot:
             raise RiotTokenInvalid(
                 f"Failed to sent request because the token is invalid, status code: {response.status_code} and message error: {message}")
 
-    def get_entity_account_lol(self):
-        info_account_hash_map = self.get_all_info_account_league()
-        try:
-            id_account = info_account_hash_map['id']
-            nick = info_account_hash_map['nick']
-            level = info_account_hash_map['level']
-            rank = info_account_hash_map['rank']
-            tier = info_account_hash_map['tier']
-            winrate = info_account_hash_map['winrate']
-            pdl = info_account_hash_map['pdl']
-            op_gg = info_account_hash_map['op_gg']
-            best_champ_url = info_account_hash_map['best_champ']
-            account_lol_entity = AccountLoL(id_account, nick, level, rank, tier, winrate, pdl, op_gg, best_champ_url)
-            return account_lol_entity
-        except KeyError as e:
-            self.logger.get_logger_info_error().error(
-                "ERROR ON FUNCTION 'GET_ENTITY_ACCOUNT_LOL' GET VALUES OF HASH MAP")
-            raise ErrorGetValueHashMapInfoAccount(f"ERROR WHILE GET VALUES OF HASH MAP WITH INFO ACCOUNT LEAGUE: {e}")
-
     def get_all_info_account_league(self):
         self.get_account_id_by_nick()
         self.get_account_tier_rank_and_pdl()
@@ -82,7 +63,7 @@ class ApiRiot:
                 f'Failed to recover summoners info by nick, status code: {response_api.status_code}')
         response_api_json = response_api.json()
         self.id_account = response_api_json['id']
-        self.puuid = response_api_json['puuid'] # ID ALTERNATIVE RIOT ACCOUNT
+        self.puuid = response_api_json['puuid']  # ID ALTERNATIVE RIOT ACCOUNT
         return self.id_account
 
     def get_account_tier_rank_and_pdl(self):
@@ -135,9 +116,8 @@ class ApiRiot:
         self.winrate = winrate_round
         return self.winrate
 
-    # --- THESE FUNCTIONS BELLOW DON'T WORK ON MOMENT --- #
     def get_id_best_champion_account_by_puuid(self):
-        endpoint_get_id_champ_riot = f"https://br1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{self.puuid}" ## By Summoner Id was deprecated  now it needs PUUID
+        endpoint_get_id_champ_riot = f"https://br1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{self.puuid}"  ## By Summoner Id was deprecated  now it needs PUUID
         response_api = requests.get(endpoint_get_id_champ_riot, headers=self.headers_token)
         self.validation_token(response_api)
         if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code != 401:

@@ -7,7 +7,7 @@ from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
 from constants.Contants import TOKEN_RIOT
 from exceptions.league_of_legends_exceptions.NickIsNone import NickIsNone
 from view.view_league_of_legends.ViewEmbedLol import ViewEmbedLol
-
+from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
 
 class LolServices:
 
@@ -22,7 +22,8 @@ class LolServices:
         try:
             self.nick = self.parser_nick_command(ctx)
             self.lol_api_services = ApiRiot(self.nick, TOKEN_RIOT)
-            entity_account = self.lol_api_services.get_entity_account_lol()
+            factory_entity_lol = FactoryLolAccount(self.lol_api_services.get_all_info_account_league())
+            entity_account = factory_entity_lol.create_account_lol_entity()
             await self.view_embeds.get_embed_account_lol(ctx, entity_account.nick, entity_account.league,
                                                          entity_account.tier, entity_account.level,
                                                          entity_account.winrate, entity_account.pdl,

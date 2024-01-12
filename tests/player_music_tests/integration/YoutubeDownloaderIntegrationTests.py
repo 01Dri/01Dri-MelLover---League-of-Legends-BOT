@@ -43,13 +43,13 @@ class YoutubeDownloaderTest(unittest.TestCase):
         url_test = "esse_url_aqui_é_zoado"
         youtube_downloader = YoutubeDownloader(None)
         with self.assertRaises(UrlInvalidFormatYoutubeException) as context:
-            youtube_downloader.parse_url_youtube(url_test)
+            parse_url_youtube(url_test)
         self.assertEqual("The url must be from YouTube", str(context.exception))
 
     def test_parse_url(self):
         url_test = "https://www.youtube.com/watch?v=5eDk-kTE9DI"
         youtube_downloader = YoutubeDownloader(None)
-        self.assertTrue(youtube_downloader.parse_url_youtube(url_test))
+        self.assertTrue(parse_url_youtube(url_test))
 
     def test_verify_if_file_music_saved(self):
         url_test = "https://www.youtube.com/watch?v=5eDk-kTE9DI"

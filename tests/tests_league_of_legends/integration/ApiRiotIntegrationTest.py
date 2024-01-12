@@ -6,12 +6,14 @@ from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenIn
 from exceptions.league_of_legends_exceptions.SummonerAccountNotHaveInfoSoloDuoQueue import \
     SummonerAccountNotHaveInfoSoloDuoQueue
 from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
+from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
 
 
 class ApiRioIntegrationTests(unittest.TestCase):
     def test_get_account_entity(self):
         api_riot_lol = ApiRiot("Drikill", TOKEN_RIOT)
-        entity_result = api_riot_lol.get_entity_account_lol()
+        factory_account_lol = FactoryLolAccount(api_riot_lol.get_all_info_account_league())
+        entity_result = factory_account_lol.create_account_lol_entity()
         self.assertEqual("Drikill", entity_result.nick)
         self.assertEqual(402, entity_result.level)
         self.assertEqual("PLATINUM", entity_result.tier)
