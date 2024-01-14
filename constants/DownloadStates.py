@@ -2,6 +2,11 @@ from enum import Enum
 
 
 class DownloadStates(Enum):
-    FINISH = 0
-    IN_PROGRESS = 1
-    ERROR = 2
+    NO_STATUS = 0
+    FINISH = 1
+    IN_PROGRESS = 2
+    ERROR = 3
+    SKIPPED = 4
+
+    def get_status_name(self):
+        return self.name

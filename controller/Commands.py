@@ -1,6 +1,7 @@
 import time
 
 from services.league_of_legends_account.LolServices import LolServices
+from services.player_music.Player import Player
 from services.player_music.YoutubeDownloader import YoutubeDownloader
 
 
@@ -25,4 +26,7 @@ class BotCommands:
         if content_message.startswith("!mplay"):
             youtube_download = YoutubeDownloader(
                 "C:\\Users\\didvg\\Desktop\\DevFolders\\MelLover2.0folder_for_downloads_musics\\", ctx.content)
-            youtube_download.add_music_queue_download()
+            await youtube_download.add_music_queue_download()
+            player = Player("C:\\Users\\didvg\\Desktop\\DevFolders\\MelLover2.0folder_for_downloads_musics\\", ctx)
+            await player.connect_bot()
+            player.play()
