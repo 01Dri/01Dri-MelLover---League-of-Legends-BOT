@@ -1,13 +1,11 @@
 import urllib.parse
-from entities.entities_discord_account.DiscordAccount import DiscordAccount
-from exceptions.league_of_legends_exceptions.FailedGetSummonerByNick import FailedGetSummonerByNick
-from exceptions.league_of_legends_exceptions.SummonerAccountNotHaveInfoSoloDuoQueue import \
-    SummonerAccountNotHaveInfoSoloDuoQueue
-from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
 from constants.Contants import TOKEN_RIOT
-from exceptions.league_of_legends_exceptions.NickIsNone import NickIsNone
-from view.view_league_of_legends.ViewEmbedLol import ViewEmbedLol
+from entities.entities_discord_account.DiscordAccount import DiscordAccount
+from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
 from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
+from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
+from view.view_league_of_legends.ViewEmbedLol import ViewEmbedLol
+
 
 class LolServices:
 
@@ -28,16 +26,12 @@ class LolServices:
                                                          entity_account.tier, entity_account.level,
                                                          entity_account.winrate, entity_account.pdl,
                                                          entity_account.op_gg, entity_account.best_champ)
-        except NickIsNone:
-            await self.view_embeds.get_embed_account_lol_nick_is_none(ctx)
-        except FailedGetSummonerByNick:
-            await self.view_embeds.get_embed_account_lol_nick_not_exist(ctx, self.nick)
-        except SummonerAccountNotHaveInfoSoloDuoQueue:
-            await self.view_embeds.get_embed_account_lol_without_solo_duo_info(ctx, self.nick, self.lol_api_services.get_level_account_by_nick(), f"https://www.p.gg/summoners/br/{self.nick}", self.lol_api_services.get_url_splash_art_best_champ_by_id_champ())
+        except RiotResponseError:
+            await self.view_embeds.get_embed_error_get_account_lol(ctx, self.nick)
 
     def parser_nick_command(self, ctx):
         parts = ctx.content.split()
         if len(parts) > 1 and parts[0] == "!contalol":
             self.nick = urllib.parse.quote(" ".join(parts[1:]))
             return self.nick
-        raise NickIsNone("Nick doesn't can be none")
+        raise Exception("Nick doesn't can be none")

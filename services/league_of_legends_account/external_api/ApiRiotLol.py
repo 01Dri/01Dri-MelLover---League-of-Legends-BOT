@@ -1,15 +1,7 @@
 import requests
-from exceptions.league_of_legends_exceptions.ErrorGetValueHashMapInfoAccount import ErrorGetValueHashMapInfoAccount
-from exceptions.league_of_legends_exceptions.FailedGetSummonerByNick import FailedGetSummonerByNick
-from exceptions.league_of_legends_exceptions.FailedGetInfoLeagueByUserId import FailedGetInfoLeagueByUserId
-from exceptions.league_of_legends_exceptions.FailedGetSummonerLevel import FailedGetSummonerLevel
-from exceptions.league_of_legends_exceptions.FailedGetWinrateSummonerByNick import FailedGetWinrateSummonerByNick
-from exceptions.league_of_legends_exceptions.FailedGetIdChampMaestryByNick import FailedGetIdChampMaestryByNick
-from exceptions.league_of_legends_exceptions.FailedGetNameChampById import FailedGetNameChampById
+
+from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
 from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalid
-from entities.entities_league_of_legends_account.AccountLoL import AccountLoL
-from exceptions.league_of_legends_exceptions.SummonerAccountNotHaveInfoSoloDuoQueue import \
-    SummonerAccountNotHaveInfoSoloDuoQueue
 from logger.LoggerConfig import LoggerConfig
 
 
@@ -27,6 +19,8 @@ class ApiRiot:
         self.tier = None
         self.pdl = None
         self.level = None
+        self.wins = 0
+        self.losses = 0
         self.winrate = None
         self.id_best_champion = None
         self.nick_name_best_champ = None
@@ -37,11 +31,22 @@ class ApiRiot:
         self.logger.get_logger_info_level().info("VALIDATING TOKEN BY RESPONSE STATUS CODE")
         if response.status_code == 403 or response.status_code == 401:
             response_json = response.json()
-            status = response_json['status']
-            message = status['message']
-            self.logger.get_logger_info_error().error("TOKEN INVALID ERROR TRIGGERED")
+            http_status_response = response_json['status']
+            error_message_response = http_status_response['message']
+            self.logger.get_logger_info_error().error(
+                f'TOKEN INVALID STATUS: {http_status_response} ERROR MESSAGE: {error_message_response}')
             raise RiotTokenInvalid(
-                f"Failed to sent request because the token is invalid, status code: {response.status_code} and message error: {message}")
+                f"Failed to sent request because the token is invalid, status code: {response.status_code} and error message: {error_message_response}")
+
+    def verify_status_code_request(self, response):
+        if response.status_code != 200:
+            response_json = response.json()
+            http_status_response = response_json['status']
+            error_message_response = http_status_response['message']
+            self.logger.get_logger_info_error().error(
+                f'ERROR API RESPONSE RIOT, STATUS CODE: {http_status_response} ERROR MESSAGE: {error_message_response}')
+            raise RiotResponseError(
+                f'Error in riot response, status code: {http_status_response}, and error message: {error_message_response}')
 
     def get_all_info_account_league(self):
         self.get_account_id_by_nick()
@@ -58,37 +63,33 @@ class ApiRiot:
         endpoint_get_summoner_by_nick_riot = f'https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{self.nick}'
         response_api = requests.get(endpoint_get_summoner_by_nick_riot, headers=self.headers_token)
         self.validation_token(response_api)
-        if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code != 401:
-            raise FailedGetSummonerByNick(
-                f'Failed to recover summoners info by nick, status code: {response_api.status_code}')
+        self.verify_status_code_request(response_api)
         response_api_json = response_api.json()
         self.id_account = response_api_json['id']
         self.puuid = response_api_json['puuid']  # ID ALTERNATIVE RIOT ACCOUNT
         return self.id_account
 
     def get_account_tier_rank_and_pdl(self):
-        endpoint_get_summoner_league_by_id_riot = f"https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/{self.id_account}"
+        endpoint_get_summoner_league_by_id_riot = f'https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/{self.id_account}'
+        print(endpoint_get_summoner_league_by_id_riot)
         response_api = requests.get(endpoint_get_summoner_league_by_id_riot, headers=self.headers_token)
         self.validation_token(response_api)
-        if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code != 401:
-            raise FailedGetInfoLeagueByUserId(
-                f'Failed to recover league info by id, status code: {response_api.status_code}')
+        self.verify_status_code_request(response_api)
         response_api_json = response_api.json()
+        print(response_api_json)
         for item in response_api_json:
             if item.get('queueType') == 'RANKED_SOLO_5x5':
                 self.tier = item.get('tier')
                 self.rank = item.get('rank')
                 self.pdl = item.get('leaguePoints')
                 break
-        else:
-            raise SummonerAccountNotHaveInfoSoloDuoQueue("Summoner not have a solo queue info")
+        print(self.tier)
 
     def get_level_account_by_nick(self):
         endpoint_get_level_league_by_id_riot = f'https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{self.nick}'
         response_api = requests.get(endpoint_get_level_league_by_id_riot, headers=self.headers_token)
         self.validation_token(response_api)
-        if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code != 401:
-            raise FailedGetSummonerLevel(f'Failed to get summoner level. status code: {response_api.status_code}')
+        self.verify_status_code_request(response_api)
         response_api_json = response_api.json()
         self.level = response_api_json['summonerLevel']
         return self.level
@@ -97,31 +98,33 @@ class ApiRiot:
         API_ENDPOINT_RIOT_LEAGUE = f'https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/{self.id_account}'
         response_api = requests.get(API_ENDPOINT_RIOT_LEAGUE, headers=self.headers_token)
         self.validation_token(response_api)
-        if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code != 401:
-            raise FailedGetWinrateSummonerByNick(
-                f'Failed to get winrate summoner, status code: {response_api.status_code}')
+        self.verify_status_code_request(response_api)
         response_api_json = response_api.json()
-        wins = 0
-        losses = 0
-        for item in response_api_json:
+        self.get_wins_and_losses(response_api_json)
+        all_games = self.wins + self.losses
+        try:
+            winrate = (self.wins / all_games) * 100
+            winrate_round = round(winrate)
+            self.winrate = winrate_round
+            return self.winrate
+        except ZeroDivisionError:
+            self.winrate = 0
+            return self.winrate
+
+
+    def get_wins_and_losses(self, response_api):
+        for item in response_api:
             if item.get("queueType") == "RANKED_SOLO_5x5":
-                wins = item.get("wins")
-                losses = item.get("losses")
+                self.wins = item.get("wins")
+                self.losses = item.get("losses")
                 break
-        if wins == 0 and losses == 0:
-            return 0
-        total_games = wins + losses
-        winrate = (wins / total_games) * 100
-        winrate_round = round(winrate)
-        self.winrate = winrate_round
-        return self.winrate
+        return self
 
     def get_id_best_champion_account_by_puuid(self):
-        endpoint_get_id_champ_riot = f"https://br1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{self.puuid}"  ## By Summoner Id was deprecated  now it needs PUUID
-        response_api = requests.get(endpoint_get_id_champ_riot, headers=self.headers_token)
+        ENDPOINT_GET_ID_CHAMP_RIOT_BY_PUUID = f"https://br1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{self.puuid}"  ## Get Maestry Champs By Summoner Id was deprecated, now it needs PUUID
+        response_api = requests.get(ENDPOINT_GET_ID_CHAMP_RIOT_BY_PUUID, headers=self.headers_token)
         self.validation_token(response_api)
-        if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code != 401:
-            raise FailedGetIdChampMaestryByNick(f'Failed to get id champ, status code: {response_api.status_code}')
+        self.verify_status_code_request(response_api)
         response_api_json = response_api.json()
         champ_max_maestry = max(response_api_json, key=lambda x: x['championPoints'])
         id_champ_max = champ_max_maestry['championId']
@@ -131,8 +134,7 @@ class ApiRiot:
     def get_name_by_champion_id(self):
         endpoint_dragon_league_of_legends = "http://ddragon.leagueoflegends.com/cdn/13.17.1/data/en_US/champion.json"
         response_api = requests.get(endpoint_dragon_league_of_legends)
-        if response_api.status_code != 200 and response_api.status_code != 403 and response_api.status_code and 401:
-            raise FailedGetNameChampById(f"Failed to get name champ by id, status code: {response_api.status_code}")
+        self.verify_status_code_request(response_api)
         data = response_api.json()
         champions = data["data"]
         champion = next((champ for champ in champions.values() if champ["key"] == str(self.id_best_champion)), None)

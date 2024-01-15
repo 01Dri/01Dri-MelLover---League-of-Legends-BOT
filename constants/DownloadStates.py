@@ -7,6 +7,7 @@ class DownloadStates(Enum):
     IN_PROGRESS = 2
     ERROR = 3
     SKIPPED = 4
+    AWAITING = 5
 
     def get_status_name(self):
         return self.name

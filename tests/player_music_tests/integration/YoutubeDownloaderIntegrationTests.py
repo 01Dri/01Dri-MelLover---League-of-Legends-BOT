@@ -1,4 +1,3 @@
-import asyncio
 import unittest
 
 from exceptions.player_music_exceptions.UrlInvalidFormatYoutubeException import UrlInvalidFormatYoutubeException
@@ -41,7 +40,7 @@ class YoutubeDownloaderTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("FINISH", youtube_downloader.get_status_download())
         self.assertEqual(2, youtube_downloader.get_quantity_files_downloaded())
 
-    async def test_check_if_file_already_downloaded(self):
+    async def test_status_skipped_whether_file_already_downloaded(self):
         mock_path = "C:\\Users\\didvg\\Desktop\\DevFolders\\MelLover2.0folder_for_downloads_musics"
         mock_url_youtube = "https://www.youtube.com/watch?v=wz7dSGjiSgY&list=PLPzULCdMTsR-ARB4c5e08PioFwks16APQ&index=1&pp=gAQBiAQB8AUB"
         youtube_downloader = YoutubeDownloader(mock_path, mock_url_youtube)

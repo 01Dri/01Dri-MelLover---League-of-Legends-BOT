@@ -44,8 +44,9 @@ class YoutubeDownloader:
     async def download_musics_on_queue(self):
         while self.get_quantity_musics_on_queue() > 0:
             self.url = self.queue.get()
-            await self.download_music(self.url)
+            await self.download_music()
             self.logger.get_logger_info_level().info(f'QUANTITY FILES DOWNLOADED: {self.count_download_music + 1} ')
+            self.count_download_music += 1
         # self.reset_count()
 
     def get_url_track_solo_and_add_queue(self):
@@ -73,25 +74,18 @@ class YoutubeDownloader:
             return
         self.status_download = DownloadStates.IN_PROGRESS
         try:
-            await self.download_file(audio_stream, self.path)
+            file_path = audio_stream.download(self.path)
             self.status_download = DownloadStates.FINISH
             self.logger.get_logger_info_level().info(
                 f'DOWNLOAD COMPLETE: {self.current_music_file.title}, SIZE: {audio_stream.filesize_mb} MB, STATUS '
                 f'DOWNLOAD STATUS: {self.get_status_download()}')
-            self.count_download_music += 1
-
-            return self
+            return file_path
         except Exception as e:
             self.status_download = DownloadStates.ERROR
             self.logger.get_logger_info_error().error(
                 f'DOWNLOAD ERROR: {self.current_music_file.title}, EXCEPTION: {str(e)}, STATUS '
                 f'DOWNLOAD STATUS: {self.get_status_download()}')
 
-    async def download_file(self, audio_stream, path):
-        try:
-            await asyncio.to_thread(audio_stream.download(path))  # run asynchronous downloading file
-        except Exception as e:
-            self.logger.get_logger_info_error().error(str(e))
 
     def get_quantity_musics_on_queue(self):
         return int(self.queue.qsize())
@@ -112,3 +106,6 @@ class YoutubeDownloader:
 
     def get_quantity_files_downloaded(self):
         return self.count_download_music
+
+    def get_queue(self):
+        return self.queue

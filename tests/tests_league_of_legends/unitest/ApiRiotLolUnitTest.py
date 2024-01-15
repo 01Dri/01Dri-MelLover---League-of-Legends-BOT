@@ -1,7 +1,6 @@
 import unittest
 
 from exceptions.league_of_legends_exceptions.ErrorGetValueHashMapInfoAccount import ErrorGetValueHashMapInfoAccount
-from exceptions.league_of_legends_exceptions.FailedGetSummonerByNick import FailedGetSummonerByNick
 from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalid
 from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
 from constants.Contants import TOKEN_RIOT
@@ -11,7 +10,7 @@ from unittest.mock import MagicMock, patch
 class ApiRiotTest(unittest.TestCase):
     def test_get_account_id_by_nick(self):
         with patch('requests.get') as mock_get:
-            api_riot_lol = ApiRiot("Drikill",TOKEN_RIOT)
+            api_riot_lol = ApiRiot("Drikill", TOKEN_RIOT)
             mock_response = MagicMock()
             mock_response.status_code = 200
             mock_response.json.return_value = {'id': 5}

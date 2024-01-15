@@ -16,7 +16,7 @@ class ViewEmbedLol:
             .Embed(
             title='LEAGUE OF LEGENDS ACCOUNT', description="SOLO DUO QUEUE", color=COLOR_FOR_EMBEDS)
         embed.add_field(name="NICKNAME", value=nick.upper(), inline=False)
-        embed.add_field(name="TIER", value=tier + " " + league, inline=False)
+        embed.add_field(name="TIER", value=tier + league, inline=False)
         embed.add_field(name="LEVEL", value=level, inline=False)
         embed.add_field(name="WINRATE", value=f'{winrate}%', inline=False)
         embed.add_field(name="PDL", value=pdl, inline=False)
@@ -24,15 +24,7 @@ class ViewEmbedLol:
         embed.set_image(url=url_splash_art_champ)
         await ctx.reply(embed=embed)
 
-    async def get_embed_account_lol_nick_is_none(self, ctx):
-        embed = discord \
-            .Embed(
-            title='LEAGUE OF LEGENDS ACCOUNT', description="ERROR INFO", color=COLOR_FOR_EMBEDS_ERROR)
-        embed.add_field(name="Nick inválido!!!", value="Seu nick não pode ser nulo", inline=False)
-        embed.set_image(url="https://th.bing.com/th/id/OIG.8PhgK58TGnckz_lgvXvq?pid=ImgGn")  # AI IMAGE
-        await ctx.reply(embed=embed)
-
-    async def get_embed_account_lol_nick_not_exist(self, ctx, nick):
+    async def get_embed_error_get_account_lol(self, ctx, nick):
         nick = self.parser_nick_char(nick)
         embed = discord \
             .Embed(
