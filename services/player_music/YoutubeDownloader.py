@@ -44,7 +44,7 @@ class YoutubeDownloader:
     async def download_musics_on_queue(self):
         while self.get_quantity_musics_on_queue() > 0:
             self.url = self.queue.get()
-            await self.download_music()
+            await self.download_music(self.url)
             self.logger.get_logger_info_level().info(f'QUANTITY FILES DOWNLOADED: {self.count_download_music + 1} ')
             self.count_download_music += 1
         # self.reset_count()
@@ -86,7 +86,6 @@ class YoutubeDownloader:
                 f'DOWNLOAD ERROR: {self.current_music_file.title}, EXCEPTION: {str(e)}, STATUS '
                 f'DOWNLOAD STATUS: {self.get_status_download()}')
 
-
     def get_quantity_musics_on_queue(self):
         return int(self.queue.qsize())
 
@@ -109,3 +108,7 @@ class YoutubeDownloader:
 
     def get_queue(self):
         return self.queue
+
+    def get_info_track_by_url(self, url):
+        url_pytube = YouTube(url)
+        return url_pytube

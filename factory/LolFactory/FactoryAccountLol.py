@@ -8,8 +8,8 @@ class FactoryLolAccount:
         self.info_account = hash_map_info_account_lo
         pass
 
-    def create_account_lol_entity(self):
-        try :
+    def get_account_lol_instance(self):
+        try:
             id_account = self.info_account['id']
             nick = self.info_account['nick']
             level = self.info_account['level']
