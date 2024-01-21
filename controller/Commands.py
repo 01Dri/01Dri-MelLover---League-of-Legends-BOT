@@ -19,7 +19,6 @@ class BotCommands:
         self.guid_musics[ctx.author.id] = Player(DEFAULT_PATH_FOLDER_DOWNLOAD, ctx, None)
         if content_message.startswith("!contalol"):
             await self.handler_lol_srvices(ctx)
-
         if content_message.startswith("!m"):
             await self.handler_player_music(ctx, content_message)
 

@@ -31,7 +31,7 @@ class ApiRioIntegrationTests(unittest.TestCase):
 
     def test_get_winrate_account_by_nick(self):
         api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT)
-        result_winrate = api_riot_lol.get_winrate_account()
+        result_winrate = api_riot_lol.calculate_winrate_account()
         self.assertEqual(0, result_winrate)
 
     def test_get_tier_account_without_tier(self):
@@ -41,7 +41,7 @@ class ApiRioIntegrationTests(unittest.TestCase):
 
     def test_get_account_without_win_and_losses_winrate_by_nick(self):
         api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT)
-        result_winrate = api_riot_lol.get_winrate_account()
+        result_winrate = api_riot_lol.calculate_winrate_account()
         self.assertEqual(0, result_winrate)
 
     def test_get_all_account_info(self):
@@ -66,14 +66,14 @@ class ApiRioIntegrationTests(unittest.TestCase):
 
     def test_get_id_maestry_champ_by_puuid(self):
         api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT)
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid()
+        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
         self.assertEqual(157, id_champ_result)
 
     def test_get_name_by_champion_id(self):
         ID_CHAMP = 157  # YASUO
         NAME_CHAMP = "Yasuo"
         api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT)
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid()
+        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
         self.assertEqual(ID_CHAMP, id_champ_result)
         name_champ_result = api_riot_lol.get_name_by_champion_id()
         self.assertEqual(NAME_CHAMP, name_champ_result)
@@ -82,7 +82,7 @@ class ApiRioIntegrationTests(unittest.TestCase):
         ID_CHAMP = 238
         NAME_CHAMP = "Zed"
         api_riot_lol = ApiRiot("Dri#13722", TOKEN_RIOT)
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid()
+        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
         self.assertEqual(ID_CHAMP, id_champ_result)
         name_champ_result = api_riot_lol.get_name_by_champion_id()
         self.assertEqual(NAME_CHAMP, name_champ_result)
@@ -92,7 +92,7 @@ class ApiRioIntegrationTests(unittest.TestCase):
         NAME_CHAMP = "Yasuo"
         URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg"
         api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT)
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid()
+        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
         self.assertEqual(ID_CHAMP, id_champ_result)
         name_champ_result = api_riot_lol.get_name_by_champion_id()
         self.assertEqual(NAME_CHAMP, name_champ_result)
