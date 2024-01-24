@@ -1,7 +1,5 @@
 import re
-
 import requests
-
 from exceptions.league_of_legends_exceptions.RiotInvalidNickName import RiotInvalidNickName
 from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
 from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalid

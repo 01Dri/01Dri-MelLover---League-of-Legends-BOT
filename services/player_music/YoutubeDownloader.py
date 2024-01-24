@@ -30,9 +30,10 @@ class YoutubeDownloader:
         self.count_download_music = 0
         self.current_music_file = None
         self.logger = LoggerConfig()
-        parse_url_youtube(self.url)
         self.status_download = DownloadStates.NO_STATUS
         self.file_manager = FileManager(self.path)
+        parse_url_youtube(self.url)
+
 
     async def add_music_queue_to_download(self):
         if is_playlist_link(self.url):

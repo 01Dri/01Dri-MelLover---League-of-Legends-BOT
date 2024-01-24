@@ -45,9 +45,10 @@ class LolServices:
                                                                                entity_account.best_champ)
             self.logger.get_logger_info_level().info(f"LEAGUE OF LEGENDS ACCOUNT OF: {self.nick} DISPLAYED")
             return
-
         await self.view_embeds.get_embed_account_lol(ctx, entity_account.nick, entity_account.league,
                                                      entity_account.tier, entity_account.level,
                                                      entity_account.winrate, entity_account.pdl,
                                                      entity_account.op_gg, entity_account.best_champ)
         self.logger.get_logger_info_level().info(f"LEAGUE OF LEGENDS ACCOUNT OF: {self.nick} DISPLAYED")
+
+
