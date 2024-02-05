@@ -8,7 +8,6 @@
 MelLoverBOT is a Discord bot that shows information about League of Legends accounts.
 
 ## UPDATES!!!
-
 - Now the EMBED image of `!accountlol` is the account's MAIN (champion with the highest mastery)
 ![Exemplos](https://i.ibb.co/s3fMW5G/Screenshot-from-2024-02-05-11-06-36.png)
 - FLEX ACCOUNT: Now you can to see informations about flex QUEUE
@@ -26,6 +25,10 @@ The command !accountlol-<queue> (SOLO OR FLEX QUEUE) <nick> allows users to view
 
 ### Technologies 📋
 - Discord.py: [Leia aqui a documentação da API](https://discordpy.readthedocs.io/en/stable/)
+
+## How to start
+To start the bot, you must have Docker and Docker Compose installed
+Use the command `docker-compose build` and `docker-compose up` and that's it, the bot has been started
 
 ### Contributions 🤝
 Contributions are welcome! Feel free to open issues and send pull requests to improve MelLoverBot.
