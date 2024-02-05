@@ -10,7 +10,9 @@ MelLoverBOT is a Discord bot that shows information about League of Legends acco
 ## UPDATES!!!
 
 - Now the EMBED image of `!accountlol` is the account's MAIN (champion with the highest mastery)
-![Exemplos](https://images2.imgbox.com/a0/87/Hns9PTn5_o.png)
+![Exemplos](https://i.ibb.co/s3fMW5G/Screenshot-from-2024-02-05-11-06-36.png)
+- FLEX ACCOUNT: Now you can to see informations about flex QUEUE
+- ![Example]()
 
 ## Add MelLoverBOT to your server!
 - [MelLoverBOT](https://discord.com/oauth2/authorize?client_id=1069130540306935858&scope=bot&permissions=8) link to add it to your server.
@@ -20,7 +22,7 @@ MelLoverBOT is a Discord bot that shows information about League of Legends acco
 ### Command `!accountlol-<queue> <nick>` ⚙️
 The command !accountlol-<queue> (SOLO OR FLEX QUEUE) <nick> allows users to view information about the League of Legends account.
 
-![Exemplo de Conta Lol ](https://images2.imgbox.com/96/87/op0jcuxN_o.png)
+![Exemplo de Conta Lol ](https://i.ibb.co/s3fMW5G/Screenshot-from-2024-02-05-11-06-36.png)
 
 ### Technologies 📋
 - Discord.py: [Leia aqui a documentação da API](https://discordpy.readthedocs.io/en/stable/)
