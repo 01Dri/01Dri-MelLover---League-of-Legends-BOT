@@ -18,7 +18,10 @@ class BotCommands:
             queue = await extract_queue(ctx, content_message)
             nick = await extract_nick(ctx, queue)
             lol_services = LolServices(ctx, nick, queue)
-            await lol_services.account_lol(ctx)
+            i = 0
+            while (i < 40):
+                await lol_services.account_lol(ctx)
+                i += 1
 
 
 async def extract_nick(ctx, queue):

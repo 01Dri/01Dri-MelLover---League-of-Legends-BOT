@@ -1,0 +1,11 @@
+version: '3'
+services:
+  my-python-app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./my_data:/app/data
+    environment:
+      - DEBUG=true
+    mem_limit: 512m
