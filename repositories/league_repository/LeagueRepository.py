@@ -1,7 +1,7 @@
 import sqlite3
 
 from entities.entities_league_of_legends_account.AccountLoL import AccountLoL
-from exceptions.repositories.FailedToSaveAccountInDatabaseException import FailedToSaveAccountInDatabase
+from exceptions.FailedToSaveAccountInDatabaseException import FailedToSaveAccountInDatabase
 
 
 class LeagueRepository:

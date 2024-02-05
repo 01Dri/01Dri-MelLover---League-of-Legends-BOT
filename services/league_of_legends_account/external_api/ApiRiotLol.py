@@ -49,14 +49,18 @@ class ApiRiot:
 
     ## This method make a calling of functions to set values on attributes
     def get_all_info_account_league(self):
-        self.get_account_tier_rank_pdl_win_losses_by_id_account()
+        self.update_account()
         op_gg_account = f"https://www.op.gg/summoners/br/{self.nick}-{self.tag_line}"
-        self.get_level_account_by_nick()
-        self.calculate_winrate_account()
         hash_map_info = {'id': self.id_account, 'nick': self.nick, 'tier': self.tier, 'rank': self.rank,
                          'pdl': self.pdl, 'level': self.level, 'winrate': self.winrate,
                          'op_gg': op_gg_account, 'best_champ': self.get_url_splash_art_best_champ_by_id_champ()}
         return hash_map_info
+
+    def update_account(self):
+        self.get_account_tier_rank_pdl_win_losses_by_id_account()
+        self.get_level_account_by_nick()
+        self.calculate_winrate_account()
+
 
     def get_account_id_by_nick(self):
         #  it to can get info about summoner account league, its need to get PUUID first and after get info summoner with this PUUID

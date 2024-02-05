@@ -2,3 +2,4 @@
 .env
 requirements.txt
 discloud.config
+LEAGUE_ACCOUNT.db
