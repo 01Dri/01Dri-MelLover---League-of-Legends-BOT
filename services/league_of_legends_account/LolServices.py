@@ -26,7 +26,7 @@ class LolServices:
             await self.fetch_account_info()
             await self.send_view_account_info(ctx, self.entity_account)
         except RiotResponseError:
-            await self.handle_riot_response_error(ctx, f"Account with the nick:{self.nick} not found!!!")
+            await self.handle_riot_response_error(ctx, f"This username{self.nick}  is invalid!!!")
         except RiotInvalidNickName:
             await self.handle_riot_response_error(ctx, f"Please report the tag line '#' to view your account")
 
