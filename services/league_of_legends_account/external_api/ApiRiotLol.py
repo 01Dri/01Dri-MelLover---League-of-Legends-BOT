@@ -89,6 +89,7 @@ class ApiRiot:
                 self.wins = item.get("wins")
                 self.losses = item.get("losses")
                 break
+            self.tier = "UNRANKED" # Player not have ELO
         return self
 
     def get_level_account_by_nick(self):

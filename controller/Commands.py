@@ -13,17 +13,12 @@ class BotCommands:
     async def handler_commands(self, ctx):
         if ctx.author == self.client.user:
             return
-
         content_message = ctx.content.lower()
         if content_message.startswith("!accountlol"):
             queue = await extract_queue(ctx, content_message)
             nick = await extract_nick(ctx, queue)
             lol_services = LolServices(ctx, nick, queue)
-            inicio = time.time()
             await lol_services.account_lol(ctx)
-            fim = time.time()
-            tempo_execucao = fim - inicio
-            print(f"A função levou {tempo_execucao} segundos para executar.")
 
 
 async def extract_nick(ctx, queue):
@@ -40,6 +35,6 @@ async def extract_queue(ctx, command):
         if "-solo" in command:
             return "RANKED_SOLO_5x5"
         elif "-flex" in command:
-            return "RANKED_FLEX_5x5"
+            return "RANKED_FLEX_SR"
     await get_embed_error_get_account_lol(ctx, "Queue doesn't can be none")
     raise Exception("Queue doesn't can be none")
