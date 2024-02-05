@@ -8,7 +8,7 @@ from logger.LoggerConfig import LoggerConfig
 
 class ApiRiot:
 
-    def __init__(self, nick, token) -> None:
+    def __init__(self, nick, token, queue_type) -> None:
         self.token = token
         self.headers_token = {
             'X-Riot-Token': f'{self.token}'
@@ -29,6 +29,7 @@ class ApiRiot:
         self.nick_name_best_champ = None
         self.url_splash_art_best_champ = None
         self.json_http_response_riot = None
+        self.queue_type = queue_type
         self.parse_nick_tag_line()
         self.get_account_id_by_nick()
 
@@ -57,7 +58,7 @@ class ApiRiot:
         return hash_map_info
 
     def update_account(self):
-        self.get_account_tier_rank_pdl_win_losses_by_id_account()
+        self.get_info_queue_account(self.queue_type)
         self.get_level_account_by_nick()
         self.calculate_winrate_account()
 
@@ -74,14 +75,14 @@ class ApiRiot:
         self.id_account = self.json_http_response_riot['id']
         return self.id_account
 
-    def get_account_tier_rank_pdl_win_losses_by_id_account(self):
+    def get_info_queue_account(self, queue_type):
         endpoint_get_summoner_league_by_id_riot = f'https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/{self.id_account}'
         response_api = requests.get(endpoint_get_summoner_league_by_id_riot, headers=self.headers_token)
         self.check_response(response_api)
         if not self.json_http_response_riot:
             self.set_unranked_field_if_response_is_null()  # The player of league of legends may not have info about ranked queues, then it to set 'UNRANKED' in fields
         for item in self.json_http_response_riot:
-            if item.get('queueType') == 'RANKED_SOLO_5x5':
+            if item.get('queueType') == queue_type:
                 self.tier = item.get('tier')
                 self.rank = item.get('rank')
                 self.pdl = item.get('leaguePoints')

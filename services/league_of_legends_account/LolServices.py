@@ -12,11 +12,12 @@ from dotenv import load_dotenv
 
 class LolServices:
 
-    def __init__(self, ctx, nick):
+    def __init__(self, ctx, nick, queue_type):
         self.entity_account = None
         self.lol_api_services = None
         self.nick = nick
         self.logger = LoggerConfig()
+        self.queue = queue_type
         load_dotenv()
         self.TOKEN_RIOT = os.getenv("TOKEN_RIOT")
 
@@ -31,14 +32,14 @@ class LolServices:
 
     async def send_view_account_info(self, ctx, entity_account: AccountLoL):
         if entity_account.tier == "UNRANKED":
-            await get_embed_account_lol_without_solo_duo_info(ctx, entity_account, "Solo | Duo ")
+            await get_embed_account_lol_without_solo_duo_info(ctx, entity_account, self.queue)
             self.logger.get_logger_info_level().info(f"LEAGUE OF LEGENDS ACCOUNT OF: {self.nick} DISPLAYED")
             return
-        await get_embed_account_lol(ctx, entity_account, "Solo | Duo")
+        await get_embed_account_lol(ctx, entity_account, self.queue)
         self.logger.get_logger_info_level().info(f"LEAGUE OF LEGENDS ACCOUNT OF: {self.nick} DISPLAYED")
 
     async def fetch_account_info(self):
-        self.lol_api_services = ApiRiot(self.nick, self.TOKEN_RIOT)
+        self.lol_api_services = ApiRiot(self.nick, self.TOKEN_RIOT, self.queue)
         account_info = self.lol_api_services.get_all_info_account_league()
         self.entity_account = FactoryLolAccount(account_info).get_account_lol_instance()
 

@@ -15,8 +15,10 @@ class BotCommands:
             return
 
         content_message = ctx.content.lower()
-        if content_message.startswith("!accountlol-solo"):
-            lol_services = LolServices(ctx, await parser_nick_command_lol(ctx))
+        if content_message.startswith("!accountlol"):
+            queue = await extract_queue(ctx, content_message)
+            nick = await extract_nick(ctx, queue)
+            lol_services = LolServices(ctx, nick, queue)
             inicio = time.time()
             await lol_services.account_lol(ctx)
             fim = time.time()
@@ -24,9 +26,20 @@ class BotCommands:
             print(f"A função levou {tempo_execucao} segundos para executar.")
 
 
-async def parser_nick_command_lol(ctx):
+async def extract_nick(ctx, queue):
     parts = ctx.content.split()
-    if len(parts) > 1 and parts[0] == "!accountlol-solo":
-        nick = urllib.parse.quote(" ".join(parts[1:]))
-        return nick
+    if len(parts) > 1:
+        nickname = urllib.parse.quote(" ".join(parts[1:]))
+        return nickname
     await get_embed_error_get_account_lol(ctx, "Nick doesn't can be none")
+    raise Exception("Nick doesn't can be none")
+
+
+async def extract_queue(ctx, command):
+    if "-" in command:
+        if "-solo" in command:
+            return "RANKED_SOLO_5x5"
+        elif "-flex" in command:
+            return "RANKED_FLEX_5x5"
+    await get_embed_error_get_account_lol(ctx, "Queue doesn't can be none")
+    raise Exception("Queue doesn't can be none")
