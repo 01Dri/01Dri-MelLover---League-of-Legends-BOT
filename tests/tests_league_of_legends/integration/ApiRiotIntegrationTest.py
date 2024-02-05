@@ -3,115 +3,97 @@ import unittest
 
 from dotenv import load_dotenv
 
+from exceptions.league_of_legends_exceptions.NotFoundAccountRiotException import NotFoundAccountRiotException
+from exceptions.league_of_legends_exceptions.QueueTypeInvalidException import QueueTypeInvalidException
 from exceptions.league_of_legends_exceptions.RiotInvalidNickName import RiotInvalidNickName
-from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalid
-from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
+from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalidException
 from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
 
 load_dotenv()
 TOKEN_RIOT = os.getenv("TOKEN_RIOT")
-
+ID_ACCOUNT_DRIKILL = os.getenv("ID_ACCOUNT_TEST")
+LEVEL_ACCOUNT_DRIKILL = 407
+TIER_ACCOUNT_DRIKILL = "GOLD"
+RANK_ACCOUNT_DRIKILL = "III"
+LEAGUE_POINTS_ACCOUNT_DRIKILL = 27
+WINS_ACCOUNT_DRIKILL = 58
+URL_BEST_CHAMO_ACCOUNT_DRIKILL = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg"
 
 
 class ApiRioIntegrationTests(unittest.TestCase):
-    def test_get_account_entity(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        factory_account_lol = FactoryLolAccount(api_riot_lol.get_all_info_account_league())
-        entity_result = factory_account_lol.get_account_lol_instance()
-        self.assertEqual("Drikill", entity_result.nick)
-        self.assertEqual(402, entity_result.level)
-        self.assertEqual("UNRANKED", entity_result.tier)
-        self.assertEqual(0, entity_result.winrate)
-        self.assertEqual(0, entity_result.pdl)
 
-    def test_get_id_account_by_nick(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        id_account_result = api_riot_lol.get_account_id_by_nick()
-        self.assertEqual("VDOzqowJuT3rRD76FfHfuckdsVUIfC7ST70PZB9JVi-51X4",
-                         id_account_result)
+    def test_invalid_token(self):
+        with self.assertRaises(RiotTokenInvalidException):
+            ApiRiot("drikill#mel", "invalido", "RANKED_SOLO_5x5")
 
-    def test_level_account(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        level_result = api_riot_lol.get_level_account_by_nick()
-        self.assertEqual(402, level_result)
+    def test_invalid_queue_type(self):
+        with self.assertRaises(QueueTypeInvalidException):
+            ApiRiot("drikill#mel", TOKEN_RIOT, "queue_nao_existe")
 
-    def test_get_winrate_account_by_nick(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        result_winrate = api_riot_lol.calculate_winrate_account()
-        self.assertEqual(0, result_winrate)
+    def test_get_account_id(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_account_id_by_nick()
+        self.assertEqual(ID_ACCOUNT_DRIKILL, result)
 
-    def test_get_tier_account_without_tier(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        result_hash = api_riot_lol.get_all_info_account_league()
-        self.assertEqual("UNRANKED", result_hash['tier'])
+    def test_get_level_account(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_level_account_by_nick()
+        self.assertEqual(LEVEL_ACCOUNT_DRIKILL, result)
 
-    def test_get_account_without_win_and_losses_winrate_by_nick(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        result_winrate = api_riot_lol.calculate_winrate_account()
-        self.assertEqual(0, result_winrate)
+    def test_get_tier_account_solo_duo(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_all_info_account_league()  # GET ALL INFO RETURN DICT
+        self.assertEqual(TIER_ACCOUNT_DRIKILL, result["tier"])
 
-    def test_get_all_account_info(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        hash_info_result = api_riot_lol.get_all_info_account_league()
-        self.assertEqual("UNRANKED", hash_info_result['tier'])
+    def test_get_rank_account_solo_duo(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_all_info_account_league()
+        self.assertEqual(RANK_ACCOUNT_DRIKILL, result["rank"])
 
-    def test_get_all_account_info2(self):
-        api_riot_lol = ApiRiot("Raposy#dri", TOKEN_RIOT)
-        hash_info_result = api_riot_lol.get_all_info_account_league()
-        self.assertEqual("GOLD", hash_info_result['tier'])
+    def test_get_league_points_account_solo_duo(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_all_info_account_league()
+        self.assertEqual(LEAGUE_POINTS_ACCOUNT_DRIKILL, result["lp"])
 
-    def test_get_all_account_info3(self):
-        api_riot_lol = ApiRiot("130722#br1", TOKEN_RIOT)
-        hash_info_result = api_riot_lol.get_all_info_account_league()
-        self.assertEqual("GOLD", hash_info_result['tier'])
+    def test_get_winrate_account_solo_duo(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_all_info_account_league()
+        self.assertEqual(WINS_ACCOUNT_DRIKILL, result["winrate"])
 
-    def test_get_all_account_info4(self):
-        api_riot_lol = ApiRiot("Dri#13722", TOKEN_RIOT)
-        hash_info_result = api_riot_lol.get_all_info_account_league()
-        self.assertEqual("GOLD", hash_info_result['tier'])
+    def test_get_id_best_champ_account(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_id_best_champion_account_by_puuid_account()
+        self.assertEqual(157, result)
 
-    def test_get_id_maestry_champ_by_puuid(self):
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
-        self.assertEqual(157, id_champ_result)
+    def test_get_name_best_champ_account(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        riot_api.get_id_best_champion_account_by_puuid_account()
+        result = riot_api.get_name_by_champion_id()
+        self.assertEqual("Yasuo", result)
 
-    def test_get_name_by_champion_id(self):
-        ID_CHAMP = 157  # YASUO
-        NAME_CHAMP = "Yasuo"
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
-        self.assertEqual(ID_CHAMP, id_champ_result)
-        name_champ_result = api_riot_lol.get_name_by_champion_id()
-        self.assertEqual(NAME_CHAMP, name_champ_result)
+    def test_get_url_best_champ_account(self):
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        result = riot_api.get_all_info_account_league()
+        self.assertEqual(URL_BEST_CHAMO_ACCOUNT_DRIKILL, result["best_champ_url"])
 
-    def test_get_name_by_champion_id2(self):
-        ID_CHAMP = 238
-        NAME_CHAMP = "Zed"
-        api_riot_lol = ApiRiot("Dri#13722", TOKEN_RIOT)
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
-        self.assertEqual(ID_CHAMP, id_champ_result)
-        name_champ_result = api_riot_lol.get_name_by_champion_id()
-        self.assertEqual(NAME_CHAMP, name_champ_result)
+    def test_get_check_account_without_info_queue_type(self):  # This test verify if account is UNRANKED in specify queue
+        # On the case my account "drikill" is UNRANKED in flex queue
+        riot_api = ApiRiot("drikill#mel", TOKEN_RIOT, "RANKED_FLEX_SR")
+        result = riot_api.get_all_info_account_league()
+        self.assertEqual("UNRANKED", result["tier"])
+        self.assertEqual("UNRANKED", result["rank"])
+        self.assertEqual(0, result["lp"])
+        self.assertEqual(0, result["winrate"])
 
-    def test_get_url_splash_art_by_name_champ(self):
-        ID_CHAMP = 157  # YASUO
-        NAME_CHAMP = "Yasuo"
-        URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg"
-        api_riot_lol = ApiRiot("Drikill#mel", TOKEN_RIOT, "RANKED_SOLO_5x5")
-        id_champ_result = api_riot_lol.get_id_best_champion_account_by_puuid_account()
-        self.assertEqual(ID_CHAMP, id_champ_result)
-        name_champ_result = api_riot_lol.get_name_by_champion_id()
-        self.assertEqual(NAME_CHAMP, name_champ_result)
-        url_splash_art_result = api_riot_lol.get_url_splash_art_best_champ_by_id_champ()
-        self.assertEqual(URL_SPLASH_ART, url_splash_art_result)
+    def test_invalid_nickname_get_account_id(self):
+        with self.assertRaises(RiotInvalidNickName) as context:
+            ApiRiot("drikill#taginvalida", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        self.assertEqual("Tagline is incorrect", str(context.exception))
 
-    def test_exception_invalid_token_request(self):
-        with self.assertRaises(RiotTokenInvalid):
-            ApiRiot("Drikill#mel", "token_errado")
-
-    def test_exception_tag_line_none(self):
-        with self.assertRaises(RiotInvalidNickName):
-            ApiRiot("Drikill", "token_errado")
+    def test_not_found_account(self):
+        with self.assertRaises(NotFoundAccountRiotException) as context:
+            ApiRiot("drikill#13722", TOKEN_RIOT, "RANKED_SOLO_5x5")
+        self.assertEqual("Riot account not found", str(context.exception))
 
 
 if __name__ == '__main__':

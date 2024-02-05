@@ -16,9 +16,9 @@ class FactoryLolAccount:
             rank = self.info_account['rank']
             tier = self.info_account['tier']
             winrate = self.info_account['winrate']
-            pdl = self.info_account['pdl']
+            pdl = self.info_account['lp']
             op_gg = self.info_account['op_gg']
-            best_champ_url = self.info_account['best_champ']
+            best_champ_url = self.info_account['best_champ_url']
             return AccountLoL(id_account, nick, level, rank, tier, winrate, pdl, op_gg, best_champ_url)
         except KeyError as e:
             raise ErrorGetValueHashMapInfoAccount(f"ERROR WHILE GET VALUES OF HASH MAP WITH INFO ACCOUNT LEAGUE: {e}")

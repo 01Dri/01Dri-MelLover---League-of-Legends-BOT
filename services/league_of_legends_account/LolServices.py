@@ -1,5 +1,6 @@
 import os
 from entities.entities_league_of_legends_account.AccountLoL import AccountLoL
+from exceptions.league_of_legends_exceptions.NotFoundAccountRiotException import NotFoundAccountRiotException
 from exceptions.league_of_legends_exceptions.RiotInvalidNickName import RiotInvalidNickName
 from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
 from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
@@ -25,10 +26,12 @@ class LolServices:
         try:
             await self.fetch_account_info()
             await self.send_view_account_info(ctx, self.entity_account)
-        except RiotResponseError:
+        except NotFoundAccountRiotException:
             await self.handle_riot_response_error(ctx, f"This username{self.nick}  is invalid!!!")
         except RiotInvalidNickName:
             await self.handle_riot_response_error(ctx, f"Please report the tag line '#' to view your account")
+        except RiotResponseError:
+            await self.handle_riot_response_error(ctx, f"An error has occurred")
 
     async def send_view_account_info(self, ctx, entity_account: AccountLoL):
         if entity_account.tier == "UNRANKED":

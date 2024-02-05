@@ -1,8 +1,12 @@
 import re
+
 import requests
+
+from exceptions.league_of_legends_exceptions.NotFoundAccountRiotException import NotFoundAccountRiotException
+from exceptions.league_of_legends_exceptions.QueueTypeInvalidException import QueueTypeInvalidException
 from exceptions.league_of_legends_exceptions.RiotInvalidNickName import RiotInvalidNickName
 from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
-from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalid
+from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalidException
 from logger.LoggerConfig import LoggerConfig
 
 
@@ -30,38 +34,46 @@ class ApiRiot:
         self.url_splash_art_best_champ = None
         self.json_http_response_riot = None
         self.queue_type = queue_type
+        self.check_queue_type()
         self.parse_nick_tag_line()
         self.get_account_id_by_nick()
 
     def check_response(self, response):
-        response_json = response.json()
-        self.json_http_response_riot = response_json
-        if response.status_code != 200:
-            http_status_response = response_json['status']
-            error_message_response = http_status_response['message']
-            LOG_ERROR_RIOT_MESSAGE = f'RIOT RESPONSE, STATUS: {http_status_response}, ERROR MESSAGE {error_message_response}'
-            self.logger.get_logger_info_error().error(LOG_ERROR_RIOT_MESSAGE)
-            invalid_codes = {400, 401, 403} # INVALID TOKEN OR ERROR OF PERMISSION
-            if response.status_code in invalid_codes:
-                raise RiotTokenInvalid(
-                    f"Failed to sent request because the token is invalid, status code: {response.status_code} and error message: {error_message_response}")
-            raise RiotResponseError(
-                f"Error in riot response, status: {http_status_response}, error message: {error_message_response}")
+        invalid_codes = {400, 401, 403}  # INVALID TOKEN OR ERROR OF PERMISSION
+        if response.status_code == 200:
+            self.json_http_response_riot = response.json()
+            return
+        if response.status_code in invalid_codes:
+            self.logger.get_logger_info_error().info(f"Failed to sent request because the token is invalid, status code: {response.status_code}")
+            raise RiotTokenInvalidException(
+                f"Failed to sent request because the token is invalid, status code: {response.status_code}")
+        if response.status_code == 404:
+            self.logger.get_logger_info_error().info(f"Account not found, status code: {response.status_code}")
+            raise NotFoundAccountRiotException("Riot account not found")
+        self.logger.get_logger_info_error().info(f"Error riot response, status code: {response.status_code}")
+        raise RiotResponseError(
+            f"Error in riot response, status: {response.status_code}")
+
+    def check_queue_type(self):
+        if self.queue_type not in ["RANKED_SOLO_5x5", "RANKED_FLEX_SR"]:
+            self.logger.get_logger_info_error().error(
+                f"Error in get account from the user: {self.nick} because that QUEUE type not exist ({self.queue_type})")
+            raise QueueTypeInvalidException(f"This queue: {self.queue_type} not exist!!!")
+        return
 
     ## This method make a calling of functions to set values on attributes
     def get_all_info_account_league(self):
         self.update_account()
         op_gg_account = f"https://www.op.gg/summoners/br/{self.nick}-{self.tag_line}"
         hash_map_info = {'id': self.id_account, 'nick': self.nick, 'tier': self.tier, 'rank': self.rank,
-                         'pdl': self.pdl, 'level': self.level, 'winrate': self.winrate,
-                         'op_gg': op_gg_account, 'best_champ': self.get_url_splash_art_best_champ_by_id_champ()}
+                         'lp': self.pdl, 'level': self.level, 'winrate': self.winrate,
+                         'op_gg': op_gg_account, 'best_champ_url': self.get_url_splash_art_best_champ_by_id_champ()}
         return hash_map_info
 
     def update_account(self):
         self.get_info_queue_account(self.queue_type)
         self.get_level_account_by_nick()
         self.calculate_winrate_account()
-
 
     def get_account_id_by_nick(self):
         #  it to can get info about summoner account league, its need to get PUUID first and after get info summoner with this PUUID
@@ -79,8 +91,6 @@ class ApiRiot:
         endpoint_get_summoner_league_by_id_riot = f'https://br1.api.riotgames.com/lol/league/v4/entries/by-summoner/{self.id_account}'
         response_api = requests.get(endpoint_get_summoner_league_by_id_riot, headers=self.headers_token)
         self.check_response(response_api)
-        if not self.json_http_response_riot:
-            self.set_unranked_field_if_response_is_null()  # The player of league of legends may not have info about ranked queues, then it to set 'UNRANKED' in fields
         for item in self.json_http_response_riot:
             if item.get('queueType') == queue_type:
                 self.tier = item.get('tier')
@@ -88,8 +98,8 @@ class ApiRiot:
                 self.pdl = item.get('leaguePoints')
                 self.wins = item.get("wins")
                 self.losses = item.get("losses")
-                break
-            self.tier = "UNRANKED" # Player not have ELO
+            else:
+                self.set_unranked_field_if_response_is_null()
         return self
 
     def get_level_account_by_nick(self):
@@ -152,11 +162,15 @@ class ApiRiot:
         if len(nick_splited_porcent) > 1:
             self.nick = nick_splited_porcent[0]
             self.tag_line = nick_splited_porcent[1]
+            if len(self.tag_line) > 5:
+                raise RiotInvalidNickName('Tagline is incorrect')
             return self
 
         nick_splited_hash = self.nick.split("#")
         if len(nick_splited_hash) > 1:
             self.nick = nick_splited_hash[0]
             self.tag_line = nick_splited_hash[1]
+            if len(self.tag_line) > 5:
+                raise RiotInvalidNickName('Tagline is incorrect')
             return self
         raise RiotInvalidNickName('Tagline is None')
