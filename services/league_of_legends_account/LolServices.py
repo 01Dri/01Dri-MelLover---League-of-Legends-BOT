@@ -31,10 +31,10 @@ class LolServices:
 
     async def send_view_account_info(self, ctx, entity_account: AccountLoL):
         if entity_account.tier == "UNRANKED":
-            await get_embed_account_lol_without_solo_duo_info(ctx, entity_account)
+            await get_embed_account_lol_without_solo_duo_info(ctx, entity_account, "Solo | Duo ")
             self.logger.get_logger_info_level().info(f"LEAGUE OF LEGENDS ACCOUNT OF: {self.nick} DISPLAYED")
             return
-        await get_embed_account_lol(ctx, entity_account)
+        await get_embed_account_lol(ctx, entity_account, "Solo | Duo")
         self.logger.get_logger_info_level().info(f"LEAGUE OF LEGENDS ACCOUNT OF: {self.nick} DISPLAYED")
 
     async def fetch_account_info(self):

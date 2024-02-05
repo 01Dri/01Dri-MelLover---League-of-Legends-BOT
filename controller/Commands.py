@@ -15,7 +15,7 @@ class BotCommands:
             return
 
         content_message = ctx.content.lower()
-        if content_message.startswith("!accountlol"):
+        if content_message.startswith("!accountlol-solo"):
             lol_services = LolServices(ctx, await parser_nick_command_lol(ctx))
             inicio = time.time()
             await lol_services.account_lol(ctx)
@@ -26,7 +26,7 @@ class BotCommands:
 
 async def parser_nick_command_lol(ctx):
     parts = ctx.content.split()
-    if len(parts) > 1 and parts[0] == "!accountlol":
+    if len(parts) > 1 and parts[0] == "!accountlol-solo":
         nick = urllib.parse.quote(" ".join(parts[1:]))
         return nick
     await get_embed_error_get_account_lol(ctx, "Nick doesn't can be none")
