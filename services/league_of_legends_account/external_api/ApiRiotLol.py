@@ -3,8 +3,6 @@ import re
 import requests
 
 from exceptions.league_of_legends_exceptions.NotFoundAccountRiotException import NotFoundAccountRiotException
-from exceptions.league_of_legends_exceptions.QueueTypeInvalidException import QueueTypeInvalidException
-from exceptions.league_of_legends_exceptions.RiotInvalidNickName import RiotInvalidNickName
 from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
 from exceptions.league_of_legends_exceptions.RiotTokenInvalid import RiotTokenInvalidException
 from logger.LoggerConfig import LoggerConfig
@@ -12,14 +10,14 @@ from logger.LoggerConfig import LoggerConfig
 
 class ApiRiot:
 
-    def __init__(self, nick, token, queue_type) -> None:
+    def __init__(self, nick,tag_line,  token, queue_type) -> None:
         self.token = token
         self.headers_token = {
             'X-Riot-Token': f'{self.token}'
         }
         self.logger = LoggerConfig()
         self.nick = nick
-        self.tag_line = None
+        self.tag_line = tag_line
         self.id_account = None
         self.puuid = None
         self.rank = None
@@ -34,8 +32,6 @@ class ApiRiot:
         self.url_splash_art_best_champ = None
         self.json_http_response_riot = None
         self.queue_type = queue_type
-        self.check_queue_type()
-        self.parse_nick_tag_line()
         self.get_account_id_by_nick()
 
     def check_response(self, response):
@@ -54,14 +50,6 @@ class ApiRiot:
         raise RiotResponseError(
             f"Error in riot response, status: {response.status_code}")
 
-    def check_queue_type(self):
-        if self.queue_type not in ["RANKED_SOLO_5x5", "RANKED_FLEX_SR"]:
-            self.logger.get_logger_info_error().error(
-                f"Error in get account from the user: {self.nick} because that QUEUE type not exist ({self.queue_type})")
-            raise QueueTypeInvalidException(f"This queue: {self.queue_type} not exist!!!")
-        return
-
-    ## This method make a calling of functions to set values on attributes
     def get_all_info_account_league(self):
         self.update_account()
         op_gg_account = f"https://www.op.gg/summoners/br/{self.nick}-{self.tag_line}"
@@ -155,22 +143,3 @@ class ApiRiot:
         self.wins = 0
         self.losses = 0
         return self
-
-    ## This function is used to remove the '#' character of command !contalol <nick>#<tag_line>
-    def parse_nick_tag_line(self):
-        nick_splited_porcent = self.nick.split("%23")
-        if len(nick_splited_porcent) > 1:
-            self.nick = nick_splited_porcent[0]
-            self.tag_line = nick_splited_porcent[1]
-            if len(self.tag_line) > 5:
-                raise RiotInvalidNickName('Tagline is incorrect')
-            return self
-
-        nick_splited_hash = self.nick.split("#")
-        if len(nick_splited_hash) > 1:
-            self.nick = nick_splited_hash[0]
-            self.tag_line = nick_splited_hash[1]
-            if len(self.tag_line) > 5:
-                raise RiotInvalidNickName('Tagline is incorrect')
-            return self
-        raise RiotInvalidNickName('Tagline is None')

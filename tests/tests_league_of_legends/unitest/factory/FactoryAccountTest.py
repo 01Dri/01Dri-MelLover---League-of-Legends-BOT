@@ -1,5 +1,5 @@
 import unittest
-from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
+from factory.FactoryAccountLol import FactoryLolAccount
 
 class FactoryAccountTest(unittest.TestCase):
 

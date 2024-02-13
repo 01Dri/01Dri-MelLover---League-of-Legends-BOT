@@ -1,8 +1,5 @@
-import time
-import urllib.parse
-
+from services.league_of_legends_account.LeagueServicesDB import LeagueDB
 from services.league_of_legends_account.LolServices import LolServices
-from view.view_league_of_legends.ViewEmbedLol import get_embed_error_get_account_lol
 
 
 class BotCommands:
@@ -14,27 +11,23 @@ class BotCommands:
         if ctx.author == self.client.user:
             return
         content_message = ctx.content.lower()
-        if content_message.startswith("!accountlol"):
-            queue = await extract_queue(ctx, content_message)
-            nick = await extract_nick(ctx, queue)
-            lol_services = LolServices(ctx, nick, queue)
+        if content_message.startswith("!accountlol-"):
+            lol_services = LolServices(ctx, content_message)
+            lol_instance = await lol_services.fetch_account_info()
+            if "save" in content_message:
+                service_repository_account = LeagueDB()
+                service_repository_account.save_account(ctx.author, lol_instance)
+                await lol_services.account_lol(ctx)
+                return
+            await lol_services.account_lol(ctx)
+            return
+
+        if content_message == "!accountlol":
+            service_repository_account = LeagueDB()
+            account_instance = service_repository_account.get_account(ctx.author)
+            lol_services = LolServices(ctx, None)
+            lol_services.entity_account = account_instance
             await lol_services.account_lol(ctx)
 
 
-async def extract_nick(ctx, queue):
-    parts = ctx.content.split()
-    if len(parts) > 1:
-        nickname = urllib.parse.quote(" ".join(parts[1:]))
-        return nickname
-    await get_embed_error_get_account_lol(ctx, "Nick doesn't can be none")
-    raise Exception("Nick doesn't can be none")
 
-
-async def extract_queue(ctx, command):
-    if "-" in command:
-        if "-solo" in command:
-            return "RANKED_SOLO_5x5"
-        elif "-flex" in command:
-            return "RANKED_FLEX_SR"
-    await get_embed_error_get_account_lol(ctx, "Queue doesn't can be none")
-    raise Exception("Queue doesn't can be none")

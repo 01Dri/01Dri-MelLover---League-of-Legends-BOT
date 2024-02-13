@@ -1,13 +1,10 @@
 import unittest
 
-from factory.LolFactory.FactoryAccountLol import FactoryLolAccount
+from factory.FactoryAccountLol import FactoryLolAccount
 from repositories.league_repository.LeagueRepository import LeagueRepository
 
 
 class LeagueRepositoryTest(unittest.TestCase):
-    def test_something(self):
-        self.assertEqual(True, False)  # add assertion here
-
     def test_save_account(self):
         account_lol_info = {
             'id': "sdasjdakj",
@@ -16,7 +13,7 @@ class LeagueRepositoryTest(unittest.TestCase):
             'rank': '3',
             'tier': "GOLD",
             'winrate': 50,
-            'pdl': 70,
+            'lp': 70,
             'op_gg': "testge.com.br",
             'best_champ': "Yasuo"
         }

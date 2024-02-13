@@ -10,7 +10,6 @@ class FactoryLolAccount:
 
     def get_account_lol_instance(self):
         try:
-            id_account = self.info_account['id']
             nick = self.info_account['nick']
             level = self.info_account['level']
             rank = self.info_account['rank']
@@ -19,6 +18,6 @@ class FactoryLolAccount:
             pdl = self.info_account['lp']
             op_gg = self.info_account['op_gg']
             best_champ_url = self.info_account['best_champ_url']
-            return AccountLoL(id_account, nick, level, rank, tier, winrate, pdl, op_gg, best_champ_url)
+            return AccountLoL(nick, level, rank, tier, winrate, pdl, op_gg, best_champ_url)
         except KeyError as e:
             raise ErrorGetValueHashMapInfoAccount(f"ERROR WHILE GET VALUES OF HASH MAP WITH INFO ACCOUNT LEAGUE: {e}")
