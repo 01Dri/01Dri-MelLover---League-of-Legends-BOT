@@ -25,20 +25,15 @@ class LolServices:
         self.queue = None
         self.ctx = ctx
         self.content_command_message = content
+        self.lol_api_services = None
+        self.account_info = None
         self.logger = LoggerConfig()
         load_dotenv()
         self.TOKEN_RIOT = os.getenv("TOKEN_RIOT")
 
     async def account_lol(self, ctx):
-        try:
-            self.logger.get_logger().info("LEAGUE SERVICES: Command successfully, displaying result to user")
-            await self.send_view_account_info(ctx, self.entity_account)
-        except NotFoundAccountRiotException as e:
-            await self.handle_riot_response_error(ctx, f"This username: {self.nick}  is invalid!!!")
-            self.logger.get_logger().exception(f"Exception NotFoundAccountRiotException: {e}\n{traceback.format_exc()}")
-        except RiotResponseError as e:
-            await self.handle_riot_response_error(ctx, f"An error has occurred")
-            self.logger.get_logger().exception(f"Exception RiotResponseError: {e}\n{traceback.format_exc()}")
+        self.logger.get_logger().info("LEAGUE SERVICES: Command successfully, displaying result to user")
+        await self.send_view_account_info(ctx, self.entity_account)
 
     async def send_view_account_info(self, ctx, entity_account: AccountLoL):
         if entity_account.tier == "UNRANKED":
@@ -51,10 +46,18 @@ class LolServices:
     async def fetch_account_info(self):
         self.logger.get_logger().info("LEAGUE SERVICES: Validating commands inputs")
         await self.fetch_inputs()
-        lol_api_services = ApiRiot(self.nick, self.tag_line, self.TOKEN_RIOT, self.queue)
+        try:
+            self.lol_api_services = ApiRiot(self.nick, self.tag_line, self.TOKEN_RIOT, self.queue)
+        except NotFoundAccountRiotException as e:
+            await self.handle_riot_response_error(self.ctx, f"This username: {self.nick}  is invalid!!!")
+            self.logger.get_logger().exception(f"Exception NotFoundAccountRiotException: {e}\n{traceback.format_exc()}")
         self.logger.get_logger().info("LEAGUE SERVICES: Waiting API RIOT response")
-        account_info = lol_api_services.get_all_info_account_league()
-        self.entity_account = FactoryLolAccount(account_info).get_account_lol_instance()
+        try:
+            self.account_info = self.lol_api_services.get_all_info_account_league()
+        except RiotResponseError as e:
+            await self.handle_riot_response_error(self.ctx, f"An error has occurred")
+            self.logger.get_logger().exception(f"Exception RiotResponseError: {e}\n{traceback.format_exc()}")
+        self.entity_account = FactoryLolAccount(self.account_info).get_account_lol_instance()
         self.logger.get_logger().info("LEAGUE SERVICES: Factory created the instance of league of legends account")
         return self.entity_account
 

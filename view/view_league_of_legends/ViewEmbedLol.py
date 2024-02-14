@@ -57,3 +57,23 @@ async def get_embed_account_lol_without_solo_duo_info(ctx, account_lol: AccountL
     embed.add_field(name="OPGG", value=account_lol.op_gg, inline=False)
     embed.set_image(url=account_lol.best_champ_url)
     await ctx.reply(embed=embed)
+
+
+async def get_embed_save_account_on_db(ctx, account_lol: AccountLoL, queue):
+    nick = parser_nick_char(account_lol.nick)
+    embed = discord \
+        .Embed(
+        title='LEAGUE OF LEGENDS ACCOUNT', description="", color=COLOR_FOR_EMBEDS)
+    embed.add_field(name="Account saved successfully", value=account_lol.nick, inline=False)
+    # embed.set_image(url=account_lol.best_champ_url)
+    await ctx.reply(embed=embed)
+
+
+async def get_embed_error(ctx, message, details):
+    embed = discord \
+        .Embed(
+        title='LEAGUE OF LEGENDS ACCOUNT', description="ERROR INFO", color=COLOR_FOR_EMBEDS_ERROR)
+    embed.add_field(name=message, value=details,
+                    inline=False)
+    embed.set_image(url="https://thc.bing.com/th/id/OIG.8PhgK58TGnckz_lgvXvq?pid=ImgGn")  # AI IMAGE
+    await ctx.reply(embed=embed)
