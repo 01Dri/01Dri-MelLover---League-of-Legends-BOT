@@ -14,7 +14,8 @@ class LeagueRepository:
         pass
 
     def get_account_by_nick(self, nick_discord):
-        self.con = sqlite3.connect("/home/dridev/Desktop/MelLover2.0/repositories/league_repository/LEAGUE_ACCOUNT.db")
+        db_path = "LEAGUE_ACCOUNT.db"
+        self.con = sqlite3.connect(db_path)
         self.cur = self.con.cursor()
         res = self.cur.execute("SELECT * FROM LEAGUE_ACCOUNT WHERE nick_discord = ?", (str(nick_discord),))
         result_info = res.fetchall()  # Fetchall return a List of result with tuples inside
@@ -25,10 +26,9 @@ class LeagueRepository:
         except IndexError:
             raise NotFoundAccountLolOnDB(f"Not found league of legends account by: {nick_discord} on DB ")
 
-
     def save_account(self, nick_discord, instance_account: AccountLoL):
-        self.con = sqlite3.connect(
-            "/home/dridev/Desktop/MelLover2.0/repositories/league_repository/LEAGUE_ACCOUNT.db")
+        db_path = "LEAGUE_ACCOUNT.db"
+        self.con = sqlite3.connect(db_path)
         self.cur = self.con.cursor()
         self.cur.execute("SELECT COUNT(*) FROM LEAGUE_ACCOUNT WHERE nick_discord = ?", (str(nick_discord),))
         result = self.cur.fetchone()[0]
@@ -50,7 +50,10 @@ class LeagueRepository:
                 'winrate': result_tuple[6],
                 'lp': result_tuple[7],
                 'op_gg': result_tuple[8],
-                'best_champ_url': result_tuple[9]
+                'best_champ_url': result_tuple[9],
+                'queue_type': result_tuple[10],
+                'tag_line': result_tuple[11],
+
             }
             return hash_result
         except Exception as e:
@@ -59,15 +62,16 @@ class LeagueRepository:
     def insert_account(self, instance_account, nick_discord):
         try:
             self.cur.execute(
-                "INSERT INTO LEAGUE_ACCOUNT (nick, nick_discord, league, tier, level, winrate, lp, best_champ, "
-                "op_gg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO LEAGUE_ACCOUNT (nick, tag_line, nick_discord, league, tier, level, winrate, lp, best_champ, "
+                "op_gg, queue_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     instance_account.nick,
+                    instance_account.tag_line,
                     str(nick_discord),
                     instance_account.league,
                     instance_account.tier, instance_account.level,
                     instance_account.winrate, instance_account.pdl,
-                    instance_account.best_champ_url, instance_account.op_gg))
+                    instance_account.best_champ_url, instance_account.op_gg, instance_account.queue_type))
             self.con.commit()
             self.cur.close()
             self.con.close()
@@ -77,10 +81,11 @@ class LeagueRepository:
     def update_account(self, instance_account, nick_discord):
         try:
             self.cur.execute(
-                "UPDATE LEAGUE_ACCOUNT SET nick = ?, league = ?, tier = ?, level = ?, winrate = ?, lp = ?, best_champ ="
-                "?, op_gg = ? WHERE nick_discord = ?",
+                "UPDATE LEAGUE_ACCOUNT SET nick = ?, tag_line = ?, league = ?, tier = ?, level = ?, winrate = ?, lp = ?, best_champ ="
+                "?, op_gg = ?, queue_type = ? WHERE nick_discord = ?",
                 (
                     instance_account.nick,
+                    instance_account.tag_line,
                     instance_account.league,
                     instance_account.tier,
                     instance_account.level,
@@ -88,6 +93,7 @@ class LeagueRepository:
                     instance_account.pdl,
                     instance_account.best_champ_url,
                     instance_account.op_gg,
+                    instance_account.queue_type,
                     str(nick_discord)
                 )
             )

@@ -1,6 +1,6 @@
 import unittest
 
-from factory.FactoryAccountLol import FactoryLolAccount
+from factory.factory import FactoryLolAccount
 from repositories.league_repository.LeagueRepository import LeagueRepository
 
 

@@ -35,7 +35,7 @@ class ApiRiot:
         self.get_account_id_by_nick()
 
     def check_response(self, response):
-        invalid_codes = {400, 401, 403}  # INVALID TOKEN OR ERROR OF PERMISSION
+        invalid_codes = {401, 403}  # INVALID TOKEN OR ERROR OF PERMISSION
         if response.status_code == 200:
             self.json_http_response_riot = response.json()
             return
@@ -43,7 +43,7 @@ class ApiRiot:
             self.logger.get_logger_info_error().info(f"Failed to sent request because the token is invalid, status code: {response.status_code}")
             raise RiotTokenInvalidException(
                 f"Failed to sent request because the token is invalid, status code: {response.status_code}")
-        if response.status_code == 404:
+        if response.status_code == 404 or response.status_code == 400:
             self.logger.get_logger_info_error().info(f"Account not found, status code: {response.status_code}")
             raise NotFoundAccountRiotException("Riot account not found")
         self.logger.get_logger_info_error().info(f"Error riot response, status code: {response.status_code}")
@@ -53,9 +53,9 @@ class ApiRiot:
     def get_all_info_account_league(self):
         self.update_account()
         op_gg_account = f"https://www.op.gg/summoners/br/{self.nick}-{self.tag_line}"
-        hash_map_info = {'id': self.id_account, 'nick': self.nick, 'tier': self.tier, 'rank': self.rank,
+        hash_map_info = {'id': self.id_account, 'nick': self.nick, 'tag_line':self.tag_line, 'tier': self.tier, 'rank': self.rank,
                          'lp': self.pdl, 'level': self.level, 'winrate': self.winrate,
-                         'op_gg': op_gg_account, 'best_champ_url': self.get_url_splash_art_best_champ_by_id_champ()}
+                         'op_gg': op_gg_account, 'best_champ_url': self.get_url_splash_art_best_champ_by_id_champ(), 'queue_type':self.queue_type}
         return hash_map_info
 
     def update_account(self):

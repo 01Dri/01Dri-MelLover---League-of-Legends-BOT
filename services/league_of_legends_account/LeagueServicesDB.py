@@ -1,6 +1,6 @@
 from exceptions.FailedToSaveAccountInDatabaseException import FailedToSaveAccountInDatabase
 from exceptions.NotFoundAccountLolOnDB import NotFoundAccountLolOnDB
-from factory.FactoryAccountLol import FactoryLolAccount
+from factory.factory import FactoryLolAccount
 from repositories.league_repository.LeagueRepository import LeagueRepository
 from view.view_league_of_legends.ViewEmbedLol import get_embed_error
 
@@ -15,7 +15,7 @@ class LeagueServicesDB:
         try:
             self.league_repository.save_account(nick_discord, account_instance)
         except FailedToSaveAccountInDatabase as e:
-            await get_embed_error_db(self.ctx, "Failed to save account on DB", e)
+            await get_embed_error(self.ctx, "Failed to save account on DB", e)
 
     async def get_account(self, nick_discord):
         try:

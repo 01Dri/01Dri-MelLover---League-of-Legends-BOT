@@ -9,60 +9,51 @@ from entities.entities_league_of_legends_account.AccountLoL import AccountLoL
 from exceptions.league_of_legends_exceptions.InvalidNickNameInput import InvalidNickNameInput
 from exceptions.league_of_legends_exceptions.NotFoundAccountRiotException import NotFoundAccountRiotException
 from exceptions.league_of_legends_exceptions.RiotResponseError import RiotResponseError
-from factory.FactoryAccountLol import FactoryLolAccount
+from factory.factory import FactoryLolAccount
 from logger.LoggerConfig import LoggerConfig
 from services.league_of_legends_account.external_api.ApiRiotLol import ApiRiot
 from view.view_league_of_legends.ViewEmbedLol import get_embed_account_lol, get_embed_error_get_account_lol, \
-    get_embed_account_lol_without_solo_duo_info
+    get_embed_account_lol_without_solo_duo_info, get_embed_error
 
 
 class LolServices:
 
     def __init__(self, ctx, content):
-        self.entity_account: AccountLoL = None
         self.nick = None
         self.tag_line = None
         self.queue = None
         self.ctx = ctx
         self.content_command_message = content
         self.lol_api_services = None
-        self.account_info = None
         self.logger = LoggerConfig()
         load_dotenv()
         self.TOKEN_RIOT = os.getenv("TOKEN_RIOT")
 
-    async def account_lol(self, ctx):
-        self.logger.get_logger().info("LEAGUE SERVICES: Command successfully, displaying result to user")
-        await self.send_view_account_info(ctx, self.entity_account)
-
-    async def send_view_account_info(self, ctx, entity_account: AccountLoL):
-        if entity_account.tier == "UNRANKED":
-            await get_embed_account_lol_without_solo_duo_info(ctx, entity_account, self.queue)
-            self.logger.get_logger_info_level().info(f"LEAGUE SERVICES: league of legends account from {self.nick}")
-            return
-        await get_embed_account_lol(ctx, entity_account, self.queue)
-        self.logger.get_logger_info_level().info(f"LEAGUE SERVICES: league of legends account from {self.nick}")
-
-    async def fetch_account_info(self):
+    async def get_league_account(self):
         self.logger.get_logger().info("LEAGUE SERVICES: Validating commands inputs")
         await self.fetch_inputs()
         try:
             self.lol_api_services = ApiRiot(self.nick, self.tag_line, self.TOKEN_RIOT, self.queue)
         except NotFoundAccountRiotException as e:
-            await self.handle_riot_response_error(self.ctx, f"This username: {self.nick}  is invalid!!!")
+            await get_embed_error_get_account_lol(self.ctx,
+                                                  f"**This username:** {self.nick}" + "#" + f"{self.tag_line} **is invalid!!!**")
             self.logger.get_logger().exception(f"Exception NotFoundAccountRiotException: {e}\n{traceback.format_exc()}")
-        self.logger.get_logger().info("LEAGUE SERVICES: Waiting API RIOT response")
-        try:
-            self.account_info = self.lol_api_services.get_all_info_account_league()
-        except RiotResponseError as e:
-            await self.handle_riot_response_error(self.ctx, f"An error has occurred")
-            self.logger.get_logger().exception(f"Exception RiotResponseError: {e}\n{traceback.format_exc()}")
-        self.entity_account = FactoryLolAccount(self.account_info).get_account_lol_instance()
-        self.logger.get_logger().info("LEAGUE SERVICES: Factory created the instance of league of legends account")
-        return self.entity_account
 
-    async def handle_riot_response_error(self, ctx, message):
-        await get_embed_error_get_account_lol(ctx, message)
+        self.logger.get_logger().info("LEAGUE SERVICES: Waiting API RIOT response")
+        factory_account = FactoryLolAccount(self.lol_api_services.get_all_info_account_league())
+        try:
+            account_lol: AccountLoL = factory_account.get_account_lol_instance()
+            await self.send_embeds_discord_message(self.ctx, account_lol)
+            self.logger.get_logger().info("LEAGUE SERVICES: Command successfully, displaying result to user")
+            return account_lol
+        except RiotResponseError as e:
+            await get_embed_error_get_account_lol(self.ctx, f"An error has occurred")
+            self.logger.get_logger().exception(f"Exception RiotResponseError: {e}\n{traceback.format_exc()}")
+
+    async def send_embeds_discord_message(self, ctx, entity_account: AccountLoL):
+        if entity_account.tier == "UNRANKED":
+            await get_embed_account_lol_without_solo_duo_info(ctx, entity_account, self.queue)
+        await get_embed_account_lol(ctx, entity_account)
 
     async def fetch_inputs(self):
         await self.extract_nick_and_tag_line()
@@ -74,7 +65,7 @@ class LolServices:
             full_nick = urllib.parse.quote(" ".join(parts[1:]))
             return full_nick
         self.logger.get_logger().error(f"LEAGUE SERVICES: Invalid nickname: {self.content_command_message}")
-        await self.handle_riot_response_error(self.ctx, "Nick doesn't can be none")
+        await get_embed_error(self.ctx, "Nick doesn't can be none")
         raise InvalidNickNameInput("Nick doesn't can be none")
 
     async def extract_queue(self):
@@ -86,10 +77,10 @@ class LolServices:
             if match_regex.group(1) == "flex":
                 return "RANKED_FLEX_SR"
             self.logger.get_logger().error(f"LEAGUE SERVICES: Invalid nickname: {self.content_command_message}")
-            await self.handle_riot_response_error(self.ctx, "Invalid queue, try !accountlol-solo or flex <nick>")
+            await get_embed_error(self.ctx, "Invalid queue, try !accountlol-solo or flex <nick>")
             raise InvalidNickNameInput("Queue doesn't can be none")
         self.logger.get_logger().error(f"LEAGUE SERVICES: Invalid nickname: {self.content_command_message}")
-        await self.handle_riot_response_error(self.ctx, "Queue doesn't ca be none, try !accountlol-solo or flex <nick>")
+        await get_embed_error(self.ctx, "Queue doesn't ca be none, try !accountlol-solo or flex <nick>")
         raise InvalidNickNameInput("Queue doesn't can be none")
 
     async def extract_nick_and_tag_line(self):
@@ -104,9 +95,9 @@ class LolServices:
                 self.tag_line = temp_tag_line[0]
                 return
             self.logger.get_logger().error(f"LEAGUE SERVICES: Invalid nickname: {self.content_command_message}")
-            await self.handle_riot_response_error(self.ctx, f"Invalid nickname")
+            await get_embed_error(self.ctx, f"Invalid nickname")
             raise InvalidNickNameInput(f"Invalid nickname")
 
         self.logger.get_logger().error(f"LEAGUE SERVICES: Invalid nickname: {self.content_command_message}")
-        await self.handle_riot_response_error(self.ctx, f"Please report '#' tag line")
+        await get_embed_error(self.ctx, f"Please report '#' tag line")
         raise InvalidNickNameInput("Tag line is none")
