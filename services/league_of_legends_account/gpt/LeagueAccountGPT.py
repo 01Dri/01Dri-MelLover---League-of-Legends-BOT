@@ -10,9 +10,8 @@ class LeagueAccountGPT:
     def __init__(self):
         self.client = OpenAI()
         load_dotenv()
-        self.TOKEN_GPT = os.getenv("OPENAI_TOKEN")
+        self.TOKEN_GPT = os.getenv("OPENAI_API_KEY")
 
-        pass
 
     def get_tips(self, account_instance: AccountLoL):
         self.client.api_key = self.TOKEN_GPT
