@@ -1,4 +1,6 @@
 
+# MelLoverBot - League of Legends Discord BOT 🤖
+
 ![MelLoverBot Icon](https://images2.imgbox.com/25/2b/RAG4qLwk_o.jpg)
 
 ## Add MelLoverBot to Your Server
@@ -11,7 +13,7 @@ MelLoverBOT is a Discord bot that provides information about League of Legends a
 
 ## Updates
 - Now the commands should be to use with **Slash Commands**. Examples:
-
+![Exanokes]((https://github.com/01Dri/01Dri-MelLover---League-of-Legends-BOT/assets/124473653/5b598dc5-d737-42ab-a098-35c34554cb5a))
 
 - Now the EMBED image of `!accountlol` shows the account's MAIN (champion with the highest mastery).
 ![Examples](https://i.ibb.co/s3fMW5G/Screenshot-from-2024-02-05-11-06-36.png)
