@@ -13,7 +13,7 @@ MelLoverBOT is a Discord bot that provides information about League of Legends a
 
 ## Updates
 - Now the commands should be to use with **Slash Commands**. Examples:
-![Examples](![image](https://github.com/01Dri/01Dri-MelLover---League-of-Legends-BOT/assets/124473653/3e89e8f8-7ed1-4595-8bb6-14c400567818))
+![Examples](https://github.com/01Dri/01Dri-MelLover---League-of-Legends-BOT/assets/124473653/3e89e8f8-7ed1-4595-8bb6-14c400567818)
 
 - Now the EMBED image of `!accountlol` shows the account's MAIN (champion with the highest mastery).
 ![Examples](https://i.ibb.co/s3fMW5G/Screenshot-from-2024-02-05-11-06-36.png)
