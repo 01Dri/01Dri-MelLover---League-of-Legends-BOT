@@ -1,4 +1,3 @@
-![image](https://github.com/01Dri/01Dri-MelLover---League-of-Legends-BOT/assets/124473653/5b598dc5-d737-42ab-a098-35c34554cb5a)# MelLoverBot - League of Legends Discord BOT 🤖
 
 ![MelLoverBot Icon](https://images2.imgbox.com/25/2b/RAG4qLwk_o.jpg)
 
